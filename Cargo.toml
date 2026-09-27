@@ -1,6 +1,6 @@
 [package]
 name = "rav1e"
-version = "0.8.0"
+version = "0.8.1"
 authors = ["Thomas Daede <tdaede@xiph.org>"]
 edition = "2021"
 rust-version = "1.85.0"
@@ -38,7 +38,9 @@ binaries = [
   "av-metrics",
   "nom",
 ]
-default = ["binaries", "asm", "threading", "signal_support", "git_version"]
+# asm needs nasm and the cc crate. signal_support pulls signal-hook and libc.
+# This fork keeps both off so a normal build has neither cc nor libc.
+default = ["binaries", "threading"]
 git_version = ["built/git2"]
 asm = ["nasm-rs", "cc"]
 threading = ["rayon/threads"]
@@ -77,9 +79,7 @@ dump_lookahead_data = ["byteorder", "image"]
 
 [dependencies]
 arg_enum_proc_macro = "0.3.4"
-av-scenechange = { version = "0.14.1", default-features = false, features = [
-  "asm",
-] }
+av-scenechange = { version = "0.14.1", default-features = false }
 bitstream-io = "4.1.0"
 cfg-if = "1.0"
 clap = { version = "4.5", optional = true, default-features = false, features = [
@@ -89,7 +89,6 @@ clap = { version = "4.5", optional = true, default-features = false, features = 
   "derive",
 ] }
 clap_complete = { version = "4.5", optional = true }
-libc = "0.2"
 y4m = { version = "0.8", optional = true }
 backtrace = { version = "0.3", optional = true }
 num-traits = "0.2"

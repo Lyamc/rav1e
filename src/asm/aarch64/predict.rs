@@ -19,8 +19,8 @@ use crate::predict::{
 use crate::tiling::{PlaneRegion, PlaneRegionMut};
 use crate::transform::TxSize;
 use crate::{Pixel, PixelType};
-use libc;
-use libc::{c_int, ptrdiff_t};
+use std::ffi::c_int;
+type ptrdiff_t = isize;
 use std::mem::MaybeUninit;
 use PixelType::{U16, U8};
 
@@ -29,9 +29,9 @@ macro_rules! decl_cfl_ac_fn {
     extern {
       $(
         fn $f(
-          ac: *mut MaybeUninit<i16>, src: *const u8, stride: libc::ptrdiff_t,
-          w_pad: libc::c_int, h_pad: libc::c_int,
-          width: libc::c_int, height: libc::c_int,
+          ac: *mut MaybeUninit<i16>, src: *const u8, stride: isize,
+          w_pad: std::ffi::c_int, h_pad: std::ffi::c_int,
+          width: std::ffi::c_int, height: std::ffi::c_int,
         );
       )*
     }
@@ -49,9 +49,9 @@ macro_rules! decl_cfl_ac_hbd_fn {
     extern {
       $(
         fn $f(
-          ac: *mut MaybeUninit<i16>, src: *const u16, stride: libc::ptrdiff_t,
-          w_pad: libc::c_int, h_pad: libc::c_int,
-          width: libc::c_int, height: libc::c_int,
+          ac: *mut MaybeUninit<i16>, src: *const u16, stride: isize,
+          w_pad: std::ffi::c_int, h_pad: std::ffi::c_int,
+          width: std::ffi::c_int, height: std::ffi::c_int,
         );
       )*
     }
@@ -69,8 +69,8 @@ macro_rules! decl_angular_ipred_fn {
     extern {
       $(
         fn $f(
-          dst: *mut u8, stride: libc::ptrdiff_t, topleft: *const u8,
-          width: libc::c_int, height: libc::c_int, angle: libc::c_int,
+          dst: *mut u8, stride: isize, topleft: *const u8,
+          width: std::ffi::c_int, height: std::ffi::c_int, angle: std::ffi::c_int,
         );
       )*
     }
@@ -95,10 +95,10 @@ macro_rules! decl_angular_ipred_hbd_fn {
     extern {
       $(
         fn $f(
-          dst: *mut u16, stride: libc::ptrdiff_t, topleft: *const u16,
-          width: libc::c_int, height: libc::c_int, angle: libc::c_int,
-          max_width: libc::c_int, max_height: libc::c_int,
-          bit_depth_max: libc::c_int,
+          dst: *mut u16, stride: isize, topleft: *const u16,
+          width: std::ffi::c_int, height: std::ffi::c_int, angle: std::ffi::c_int,
+          max_width: std::ffi::c_int, max_height: std::ffi::c_int,
+          bit_depth_max: std::ffi::c_int,
         );
       )*
     }
@@ -123,9 +123,9 @@ macro_rules! decl_cfl_pred_fn {
     extern {
       $(
         fn $f(
-          dst: *mut u8, stride: libc::ptrdiff_t, topleft: *const u8,
-          width: libc::c_int, height: libc::c_int, ac: *const i16,
-          alpha: libc::c_int,
+          dst: *mut u8, stride: isize, topleft: *const u8,
+          width: std::ffi::c_int, height: std::ffi::c_int, ac: *const i16,
+          alpha: std::ffi::c_int,
         );
       )*
     }
@@ -144,9 +144,9 @@ macro_rules! decl_cfl_pred_hbd_fn {
     extern {
       $(
         fn $f(
-          dst: *mut u16, stride: libc::ptrdiff_t, topleft: *const u16,
-          width: libc::c_int, height: libc::c_int, ac: *const i16,
-          alpha: libc::c_int, bit_depth_max: libc::c_int,
+          dst: *mut u16, stride: isize, topleft: *const u16,
+          width: std::ffi::c_int, height: std::ffi::c_int, ac: *const i16,
+          alpha: std::ffi::c_int, bit_depth_max: std::ffi::c_int,
         );
       )*
     }
@@ -502,12 +502,12 @@ pub fn dispatch_predict_intra<T: Pixel>(
   unsafe {
     let dst_ptr = dst.data_ptr_mut() as *mut _;
     let dst_u16 = dst.data_ptr_mut() as *mut u16;
-    let stride = T::to_asm_stride(dst.plane_cfg.stride) as libc::ptrdiff_t;
+    let stride = T::to_asm_stride(dst.plane_cfg.stride) as isize;
     let edge_ptr = edge_buf.top_left_ptr() as *const _;
     let edge_u16 = edge_buf.top_left_ptr() as *const u16;
-    let w = tx_size.width() as libc::c_int;
-    let h = tx_size.height() as libc::c_int;
-    let angle = angle as libc::c_int;
+    let w = tx_size.width() as std::ffi::c_int;
+    let h = tx_size.height() as std::ffi::c_int;
+    let angle = angle as std::ffi::c_int;
     let bd_max = (1 << bit_depth) - 1;
     match T::type_enum() {
       PixelType::U8 => match mode {
@@ -591,8 +591,8 @@ pub fn dispatch_predict_intra<T: Pixel>(
             );
             // From dav1d, dx and dy are the distance from the predicted block to the frame edge
             let (dx, dy) = (
-              (bw as isize - dst.rect().x) as libc::c_int,
-              (bh as isize - dst.rect().y) as libc::c_int,
+              (bw as isize - dst.rect().x) as std::ffi::c_int,
+              (bh as isize - dst.rect().y) as std::ffi::c_int,
             );
             return ipred_z2(
               dst.data_ptr_mut(),
@@ -670,11 +670,11 @@ pub(crate) fn pred_cfl_ac<T: Pixel, const XDEC: usize, const YDEC: usize>(
     );
   }
 
-  let stride = T::to_asm_stride(luma.plane_cfg.stride) as libc::ptrdiff_t;
-  let w = bsize.width() as libc::c_int;
-  let h = bsize.height() as libc::c_int;
-  let w_pad = w_pad as libc::c_int;
-  let h_pad = h_pad as libc::c_int;
+  let stride = T::to_asm_stride(luma.plane_cfg.stride) as isize;
+  let w = bsize.width() as std::ffi::c_int;
+  let h = bsize.height() as std::ffi::c_int;
+  let w_pad = w_pad as std::ffi::c_int;
+  let h_pad = h_pad as std::ffi::c_int;
 
   // SAFETY: Calls Assembly code.
   unsafe {

@@ -1,5 +1,7 @@
 # rav1e [![Actions Status][actions badge]][actions] [![CodeCov][codecov badge]][codecov]
 
+This is a fork of rav1e 0.8, kept for [cabin](https://github.com/Lyamc/cabin). Upstream's default build compiles assembly with NASM and the `cc` crate, depends on the `libc` crate, and turns on `av-scenechange`'s assembly feature, which also depends on `cc` and `libc`. This fork leaves those off. The encoder is the pure-Rust implementation. `libc` types in the optional assembly and C API are `std::ffi` and `isize`/`usize`, and the CLI no longer calls `getrusage`. Cabin uses it so GPUI can encode AVIF without a C compiler or `libc`.
+
 The fastest and safest AV1 encoder.
 
 <details>

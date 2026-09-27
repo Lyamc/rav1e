@@ -30,8 +30,8 @@ use std::os::raw::c_char;
 use std::os::raw::c_int;
 use std::os::raw::c_void;
 
-use libc::ptrdiff_t;
-use libc::size_t;
+type ptrdiff_t = isize;
+type size_t = usize;
 
 use num_derive::*;
 use num_traits::cast::FromPrimitive;

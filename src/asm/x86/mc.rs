@@ -448,22 +448,22 @@ macro_rules! decl_mct_fns {
       extern {
         $(
           fn [<$func_name _sse2>](
-            tmp: *mut i16, src: *const u8, src_stride: libc::ptrdiff_t, w: i32,
+            tmp: *mut i16, src: *const u8, src_stride: isize, w: i32,
             h: i32, mx: i32, my: i32
           );
 
           fn [<$func_name _ssse3>](
-            tmp: *mut i16, src: *const u8, src_stride: libc::ptrdiff_t, w: i32,
+            tmp: *mut i16, src: *const u8, src_stride: isize, w: i32,
             h: i32, mx: i32, my: i32
           );
 
           fn [<$func_name _avx2>](
-            tmp: *mut i16, src: *const u8, src_stride: libc::ptrdiff_t, w: i32,
+            tmp: *mut i16, src: *const u8, src_stride: isize, w: i32,
             h: i32, mx: i32, my: i32
           );
 
           fn [<$func_name _avx512icl>](
-            tmp: *mut i16, src: *const u8, src_stride: libc::ptrdiff_t, w: i32,
+            tmp: *mut i16, src: *const u8, src_stride: isize, w: i32,
             h: i32, mx: i32, my: i32
           );
         )*
@@ -529,12 +529,12 @@ macro_rules! decl_mct_hbd_fns {
       extern {
         $(
           fn [<$func_name _ssse3>](
-            tmp: *mut i16, src: *const u16, src_stride: libc::ptrdiff_t, w: i32,
+            tmp: *mut i16, src: *const u16, src_stride: isize, w: i32,
             h: i32, mx: i32, my: i32, bitdepth_max: i32,
           );
 
           fn [<$func_name _avx2>](
-            tmp: *mut i16, src: *const u16, src_stride: libc::ptrdiff_t, w: i32,
+            tmp: *mut i16, src: *const u16, src_stride: isize, w: i32,
             h: i32, mx: i32, my: i32, bitdepth_max: i32,
           );
         )*
@@ -580,27 +580,27 @@ cpu_function_lookup_table!(
 
 extern {
   fn rav1e_avg_8bpc_ssse3(
-    dst: *mut u8, dst_stride: libc::ptrdiff_t, tmp1: *const i16,
+    dst: *mut u8, dst_stride: isize, tmp1: *const i16,
     tmp2: *const i16, w: i32, h: i32,
   );
 
   fn rav1e_avg_8bpc_avx2(
-    dst: *mut u8, dst_stride: libc::ptrdiff_t, tmp1: *const i16,
+    dst: *mut u8, dst_stride: isize, tmp1: *const i16,
     tmp2: *const i16, w: i32, h: i32,
   );
 
   fn rav1e_avg_8bpc_avx512icl(
-    dst: *mut u8, dst_stride: libc::ptrdiff_t, tmp1: *const i16,
+    dst: *mut u8, dst_stride: isize, tmp1: *const i16,
     tmp2: *const i16, w: i32, h: i32,
   );
 
   fn rav1e_avg_16bpc_ssse3(
-    dst: *mut u16, dst_stride: libc::ptrdiff_t, tmp1: *const i16,
+    dst: *mut u16, dst_stride: isize, tmp1: *const i16,
     tmp2: *const i16, w: i32, h: i32, bitdepth_max: i32,
   );
 
   fn rav1e_avg_16bpc_avx2(
-    dst: *mut u16, dst_stride: libc::ptrdiff_t, tmp1: *const i16,
+    dst: *mut u16, dst_stride: isize, tmp1: *const i16,
     tmp2: *const i16, w: i32, h: i32, bitdepth_max: i32,
   );
 }

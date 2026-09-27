@@ -13,10 +13,10 @@ use std::mem::MaybeUninit;
 
 // Note: Input coeffs are mutable since the assembly uses them as a scratchpad
 pub type InvTxfmFunc =
-  unsafe extern fn(*mut u8, libc::ptrdiff_t, *mut i16, i32);
+  unsafe extern fn(*mut u8, isize, *mut i16, i32);
 
 pub type InvTxfmHBDFunc =
-  unsafe extern fn(*mut u16, libc::ptrdiff_t, *mut i16, i32, i32);
+  unsafe extern fn(*mut u16, isize, *mut i16, i32, i32);
 
 pub fn call_inverse_func<T: Pixel>(
   func: InvTxfmFunc, input: &[T::Coeff], output: &mut PlaneRegionMut<'_, T>,

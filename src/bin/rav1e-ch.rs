@@ -346,30 +346,8 @@ fn init_logger() {
     .unwrap();
 }
 
-cfg_if::cfg_if! {
-  if #[cfg(any(target_os = "windows", target_arch = "wasm32"))] {
-    fn print_rusage() {
-      eprintln!("Resource usage reporting is not currently supported on this platform");
-    }
-  } else {
-    fn print_rusage() {
-      // SAFETY: This uses an FFI, it is safe because we call it correctly.
-      let (utime, stime, maxrss) = unsafe {
-        let mut usage = std::mem::zeroed();
-        let _ = libc::getrusage(libc::RUSAGE_SELF, &mut usage);
-        (usage.ru_utime, usage.ru_stime, usage.ru_maxrss)
-      };
-      eprintln!(
-        "user time: {} s",
-        utime.tv_sec as f64 + utime.tv_usec as f64 / 1_000_000f64
-      );
-      eprintln!(
-        "system time: {} s",
-        stime.tv_sec as f64 + stime.tv_usec as f64 / 1_000_000f64
-      );
-      eprintln!("maximum rss: {} KB", maxrss);
-    }
-  }
+fn print_rusage() {
+  eprintln!("Resource usage reporting is not available in this build");
 }
 
 fn run() -> Result<(), error::CliError> {
